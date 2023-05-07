@@ -9,6 +9,7 @@ using namespace yazi::json;
 /* Tips
     1) 先按Ctrl + k，再按Ctrl + c，可以注释选中的多行代码
     2) 先按Ctrl + k，再按Ctrl + u，可以取消注释选中的多行代码(Ctrl + k称为先导按键)
+    3) 本代码在Windows环境下无法运行，在Linux环境下通过makefile编译后可以运行
 */
 
 int main()

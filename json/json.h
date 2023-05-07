@@ -1,5 +1,4 @@
 #pragma once //常用的C/C++预处理指令，保证头文件只被编译一次，防止头文件被重复引用
-
 #include <iostream>
 #include <string>
 using std::string;
