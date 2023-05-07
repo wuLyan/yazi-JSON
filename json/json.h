@@ -1,4 +1,5 @@
 #pragma once //常用的C/C++预处理指令，保证头文件只被编译一次，防止头文件被重复引用
+
 #include <iostream>
 #include <string>
 using std::string;
@@ -8,6 +9,10 @@ using std::ostream;
 
 #include <vector>
 #include <map>
+
+/* Tips：
+    1) 对类的非构造函数的其他成员函数的注释要写在函数声明的上方，这样在其他文件中当光标放在函数名上时也能够看到注释
+*/
 
 //创建新的声明区域，防止命名冲突
 namespace yazi {
@@ -55,10 +60,11 @@ public:
     double as_double() const;
     string as_string() const;
 
-    // number of values in array or object
+    // number of values in array or object(获取数组或对象容器中的元素个数)
     int size() const;
 
-    // return true if empty array, empty object, or null, otherwise, false.
+    // return true if empty array, empty object, or null, otherwise, false
+    //(当数组为空、对象为空、或者为null时返回true，否则返回false)
     bool empty() const;
 
     void clear();
@@ -75,7 +81,7 @@ public:
     void remove(const char * key);
     void remove(const string & key);
 
-    // append value to array at the end.
+    // append value to array at the end(在数组末尾追加值)
     void append(const Json & value);
     void append(Json && value);
 
@@ -95,6 +101,7 @@ public:
         return os;
     }
 
+    //重载运算符，实现Json对象与其他数据类型的类型转换
     operator bool();
     operator int();
     operator double();
@@ -102,6 +109,7 @@ public:
     operator string() const;
 
     void parse(const string & str);
+    //以字符串的形式输出Json对象的内容
     string str() const;
 
     typedef std::vector<Json>::iterator iterator;
@@ -115,8 +123,10 @@ public:
     }
 
 private:
-    void copy(const Json & other); //拷贝函数
-    void swap(Json & other); //交换函数
+    //拷贝函数，对于指针类型成员变量全部执行深拷贝
+    void copy(const Json & other);
+    //交换函数
+    void swap(Json & other);
 
 private:
     //结构体中各成员变量共用内存空间，结构体内存空间的大小为最大成员变量占用内存空间的大小
@@ -132,7 +142,7 @@ private:
         std::map<string, Json> *m_object;
     };
 
-    //对于任一JSON字段，只有类型与值两种属性，因此定义枚举类型存储字段类型，用联合体类型存储字段值
+    //对于任一JSON字段，只有类型与内容两种属性，因此定义枚举类型存储字段类型，用联合体类型存储字段内容
     Type m_type;
     Value m_value;
 };

@@ -7,6 +7,12 @@ using std::stringstream;
 #include <json/parser.h>
 using namespace yazi::json; //引入自定义的命名空间
 
+/* Tips：
+    1) 
+    2) 
+    3) 
+*/
+
 Json::Json() : m_type(json_null)
 {
 }
@@ -159,7 +165,7 @@ string Json::as_string() const
     throw std::logic_error("function Json::asString value type error");
 }
 
-void Json::copy(const Json & other) //对于指针类型成员变量全部执行深拷贝
+void Json::copy(const Json & other)
 {
     clear();
     m_type = other.m_type;
@@ -463,7 +469,7 @@ Json & Json::operator [] (int index)
     {
         throw std::logic_error("function [] index less than 0");
     }
-    int size = (m_value.m_array)->size();
+    int size = (m_value.m_array)->size(); //获取vector的大小
     if (index >= size)
     {
         throw std::logic_error("function [] out of range");
@@ -521,7 +527,7 @@ Json::operator string()
     {
         throw std::logic_error("function Json::operator (string) requires string value");
     }
-    return *(m_value.m_string);
+    return *(m_value.m_string); //这里与上面稍有区别，因为存放的是指针，所以要解引用
 }
 
 Json::operator string() const
@@ -565,7 +571,7 @@ string Json::str() const
             ss << m_value.m_double;
             break;
         case json_string:
-            ss << "\"" << *(m_value.m_string) << "\"";
+            ss << "\"" << *(m_value.m_string) << "\""; //注意输出格式，双引号都需要转义
             break;
         case json_array:
             {
@@ -573,7 +579,7 @@ string Json::str() const
                 for (auto it = (m_value.m_array)->begin(); it != (m_value.m_array)->end(); it++)
                 {
                     if (it != (m_value.m_array)->begin())
-                    {
+                    {   //数组各元素之间用逗号隔开
                         ss << ",";
                     }
                     ss << (*it).str();
@@ -590,7 +596,7 @@ string Json::str() const
                     {
                         ss << ",";
                     }
-                    ss << "\"" << it->first << "\":" << it->second.str();
+                    ss << "\"" << it->first << "\":" << it->second.str(); //迭代器指向的是pair类型
                 }
                 ss << "}";
             }

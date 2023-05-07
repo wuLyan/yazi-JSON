@@ -6,10 +6,12 @@ using namespace std;
 #include <json/json.h>
 using namespace yazi::json;
 
-/* Tips
-    1) å…ˆæŒ‰Ctrl + kï¼Œå†æŒ‰Ctrl + cï¼Œå¯ä»¥æ³¨é‡Šé€‰ä¸­çš„å¤šè¡Œä»£ç 
-    2) å…ˆæŒ‰Ctrl + kï¼Œå†æŒ‰Ctrl + uï¼Œå¯ä»¥å–æ¶ˆæ³¨é‡Šé€‰ä¸­çš„å¤šè¡Œä»£ç (Ctrl + kç§°ä¸ºå…ˆå¯¼æŒ‰é”®)
-    3) æœ¬ä»£ç åœ¨WindowsçŽ¯å¢ƒä¸‹æ— æ³•è¿è¡Œï¼Œåœ¨LinuxçŽ¯å¢ƒä¸‹é€šè¿‡makefileç¼–è¯‘åŽå¯ä»¥è¿è¡Œ
+/* Tips£º
+    1) ÏÈ°´Ctrl + k£¬ÔÙ°´Ctrl + c£¬¿ÉÒÔ×¢ÊÍÑ¡ÖÐµÄ¶àÐÐ´úÂë
+    2) ÏÈ°´Ctrl + k£¬ÔÙ°´Ctrl + u£¬¿ÉÒÔÈ¡Ïû×¢ÊÍÑ¡ÖÐµÄ¶àÐÐ´úÂë(Ctrl + k³ÆÎªÏÈµ¼°´¼ü)
+    3) °´ÏÂTab¼ü£¬¿ÉÒÔ×Ô¶¯Ëõ½øÑ¡ÖÐµÄ¶àÐÐ´úÂë£»°´ÏÂShift + Tab¼ü£¬¿ÉÒÔ·´ÏòËõ½øÑ¡ÖÐµÄ¶àÐÐ´úÂë
+    4) ¹æ·¶µÄ´úÂëÐ´·¨£º¹Ø¼ü×Öfor¡¢if¡¢whileºóÃæµÄ×óÀ¨ºÅÇ°ÃæÁô¿Õ¸ñ£¬ÓëÒ»°ãµÄº¯Êýµ÷ÓÃÇø·Ö¿ª
+    5) ±¾ÏîÄ¿´úÂë²»Ö§³ÖWindows»·¾³ÏÂÔËÐÐ£¬ÐèÒªÔÚLinux»·¾³ÏÂÊ¹ÓÃmakefile±àÒëºóÔËÐÐ
 */
 
 int main()
@@ -33,17 +35,19 @@ int main()
     std::cout << v2.str() << std::endl;
     std::cout << v3.str() << std::endl;
     std::cout << v4.str() << std::endl;
-
-    bool b = v1;
-    int i = v2;
-    double f = v3;
-    const string & s = v4;
-
-    Json null;
-    std::cout << null.str() << std::endl;
     return 0;
 
-    // // array value
+    //JsonÀàÐÍ×ª»»Îª»ù±¾Êý¾ÝÀàÐÍ
+    // bool b = v1;
+    // int i = v2;
+    // double f = v3;
+    // const string & s = v4;
+
+    // Json null;
+    // std::cout << null.str() << std::endl;
+    // return 0;
+
+    // array value
     // Json arr;
     // arr.append(123);
     // arr.append(1.23);
@@ -52,7 +56,7 @@ int main()
     // std::cout << arr[0] << "," << arr[1] << "," << arr[2] << std::endl;
     // return 0;
 
-    // // object value
+    // object value
     // Json obj;
     // obj["name"] = "jun";
     // obj["age"] = 18;
