@@ -5,14 +5,16 @@ using std::stringstream;
 
 #include <json/json.h>
 #include <json/parser.h>
-using namespace yazi::json;
+using namespace yazi::json; //引入自定义的命名空间
 
 Json::Json() : m_type(json_null)
 {
 }
 
+//涉及到构造函数的重载，根据传入的参数不同选择调用不同的构造函数
 Json::Json(Type type) : m_type(type)
 {
+    //使switch语句的case标签可以使用枚举类型，但别忘记每种case都要有break语句
     switch (m_type)
     {
         case json_null:
@@ -39,6 +41,8 @@ Json::Json(Type type) : m_type(type)
     }
 }
 
+//使用成员初始化列表的方式初始化枚举类型变量
+//使用成员运算符的方式初始化联合体类型变量
 Json::Json(bool value) : m_type(json_bool)
 {
     m_value.m_bool = value;
@@ -155,7 +159,7 @@ string Json::as_string() const
     throw std::logic_error("function Json::asString value type error");
 }
 
-void Json::copy(const Json & other)
+void Json::copy(const Json & other) //对于指针类型成员变量全部执行深拷贝
 {
     clear();
     m_type = other.m_type;
