@@ -30,7 +30,7 @@ char Parser::get_next_token()
     skip_white_space();
     if (m_idx == m_str.size())
         throw std::logic_error("unexpected end of input");
-    return m_str[m_idx++];
+    return m_str[m_idx++]; //在函数结束时实际上m_idx是待解析字符串中第二个非空白字符
 }
 
 Json Parser::parse()
@@ -38,8 +38,9 @@ Json Parser::parse()
     char ch = get_next_token();
     switch (ch)
     {
+        // HINT：通过待解析字符串的第一个非空白字符判断字段类型
         case 'n':
-            m_idx--;
+            m_idx--; //将m_idx回退到待解析字符串中的第一个非空白字符，方便后续分字段类型解析的比较操作
             return parse_null();
         case 't':
         case 'f':
@@ -59,7 +60,7 @@ Json Parser::parse()
             m_idx--;
             return parse_number();
         case '"':
-            return Json(parse_string());
+            return Json(parse_string()); //通过解析函数的返回值构造一个匿名Json对象 
         case '[':
             return parse_array();
         case '{':
@@ -72,6 +73,7 @@ Json Parser::parse()
 
 Json Parser::parse_null()
 {
+    // HINT：当与被比较的字符串完全相等时，成员函数compare()返回0
     if (m_str.compare(m_idx, 4, "null") == 0)
     {
         m_idx += 4;
@@ -97,18 +99,19 @@ Json Parser::parse_bool()
 
 Json Parser::parse_number()
 {
-    size_t pos = m_idx;
+    size_t pos = m_idx; //保存开始解析的位置
 
     if (m_str[m_idx] == '-')
         m_idx++;
 
-    // integer part
-    if (m_str[m_idx] == '0')
+    // integer part(整数部分)
+    if (m_str[m_idx] == '0') //跳过整数部分的前导0
     {
         m_idx++;
     }
     else if (in_range(m_str[m_idx], '1', '9'))
     {
+        // HINT：整数部分的第一个有效数字只能在1~9之间，不能是0，但之后的数字可以是0，所以要加两重循环判断
         m_idx++;
         while (in_range(m_str[m_idx], '0', '9'))
         {
@@ -123,10 +126,13 @@ Json Parser::parse_number()
     if (m_str[m_idx] != '.')
     {
         return Json(std::atoi(m_str.c_str() + pos));
+        // HINT：c_str()函数将C++的string对象转化为C的字符串数组，即最后返回const char *类型的变量
+        // HINT：但是因为可能前面跳过了某些空白字符，需要加上解析开始的位置，直到'\0'才是真正需要进行转换的数字(含正负号)
     }
 
-    // decimal part
-    m_idx++;
+    // decimal part(小数部分)
+    // HINT：对于double类型的字段内容，分整数部分与小数部分两步进行处理
+    m_idx++; //跳过小数点
     if (!in_range(m_str[m_idx], '0', '9'))
     {
         throw std::logic_error("at least one digit required in fractional part");
@@ -136,6 +142,7 @@ Json Parser::parse_number()
         m_idx++;
     }
     return Json(std::atof(m_str.c_str() + pos));
+    // return Json(std::atod(m_str.c_str() + pos));
 }
 
 string Parser::parse_string()
