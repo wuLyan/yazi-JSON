@@ -72,6 +72,7 @@ Json::Json(const char * value) : m_type(json_string)
 Json::Json(const string & value) : m_type(json_string)
 {
     m_value.m_string = new string(value);
+    //与上一个Json构造函数在开辟内存空间时调用了不同的string构造函数
 }
 
 Json::Json(const Json & other) : m_type(json_null)
@@ -269,6 +270,7 @@ void Json::clear()
                 {
                     delete m_value.m_string;
                     m_value.m_string = nullptr;
+                    //delete释放指针之后还要把指针置为空，这是一套连招
                 }
             }
             break;
@@ -278,7 +280,7 @@ void Json::clear()
                 {
                     for (auto it = (m_value.m_array)->begin(); it != (m_value.m_array)->end(); it++)
                     {
-                        it->clear();
+                        it->clear(); //递归调用，因为vector中存放的是Json类型的对象
                     }
                     delete m_value.m_array;
                     m_value.m_array = nullptr;
@@ -291,7 +293,7 @@ void Json::clear()
                 {
                     for (auto it = (m_value.m_object)->begin(); it != (m_value.m_object)->end(); it++)
                     {
-                        it->second.clear();
+                        it->second.clear(); //递归调用，因为pair中第二个类型是Json类型
                     }
                     delete m_value.m_object;
                     m_value.m_object = nullptr;
@@ -327,6 +329,7 @@ bool Json::has(const string & key) const
         return false;
     }
     return (m_value.m_object)->find(key) != (m_value.m_object)->end();
+    //当find()函数找不到key时，返回的是end()迭代器
 }
 
 Json Json::get(int index) const
@@ -384,6 +387,7 @@ void Json::remove(const string & key)
         return;
     }
     auto it = (m_value.m_object)->find(key);
+    //当find()函数找不到key时，返回的是end()迭代器
     if (it != (m_value.m_object)->end())
     {
         it->second.clear();
@@ -474,11 +478,12 @@ Json & Json::operator [] (int index)
     {
         throw std::logic_error("function [] out of range");
     }
-    return (*(m_value.m_array))[index];
+    return (*(m_value.m_array))[index]; //vector容器本身有[]运算符重载
 }
 
 Json & Json::operator [] (const char * key)
 {
+    //使用字符串字面值构造string对象，进而将两个函数的思路统一
     string name = key;
     return (*this)[name];
 }
@@ -548,7 +553,7 @@ void Json::parse(const string & str)
 
 string Json::str() const
 {
-    stringstream ss;
+    stringstream ss; //既可从string读数据，也可向string写数据
     switch (m_type)
     {
         case json_null:
@@ -583,6 +588,7 @@ string Json::str() const
                         ss << ",";
                     }
                     ss << (*it).str();
+                    //ss << it->str();
                 }
                 ss << "]";
             }

@@ -47,6 +47,7 @@ public:
 
     Type type() const;
 
+    //类型判断
     bool is_null() const;
     bool is_bool() const;
     bool is_int() const;
@@ -55,6 +56,7 @@ public:
     bool is_array() const;
     bool is_object() const;
 
+    //类型转换，实现Json类型向其他数据类型的转换
     bool as_bool() const;
     int as_int() const;
     double as_double() const;
@@ -67,9 +69,12 @@ public:
     //(当数组为空、对象为空、或者为null时返回true，否则返回false)
     bool empty() const;
 
+    //释放内存
     void clear();
 
+    //判断vector中是否包含给定索引
     bool has(int index) const;
+    //判断map中是否包含给定key
     bool has(const char * key) const;
     bool has(const string & key) const;
 
@@ -77,7 +82,9 @@ public:
     Json get(const char * key) const;
     Json get(const string & key) const;
 
+    //删除vector中给定索引
     void remove(int index);
+    //删除map中给定key
     void remove(const char * key);
     void remove(const string & key);
 
@@ -88,6 +95,7 @@ public:
     Json & operator = (const Json & other);
     Json & operator = (Json && other);
 
+    //判断两个Json对象是否相等
     bool operator == (const Json & other);
     bool operator != (const Json & other);
 
@@ -101,7 +109,7 @@ public:
         return os;
     }
 
-    //重载运算符，实现Json对象与其他数据类型的类型转换
+    //重载运算符，实现其他数据类型向Json类型的转换
     operator bool();
     operator int();
     operator double();
@@ -115,6 +123,7 @@ public:
     typedef std::vector<Json>::iterator iterator;
     iterator begin()
     {
+        //内联函数，直接返回容器的迭代器
         return (m_value.m_array)->begin();
     }
     iterator end()
@@ -129,9 +138,9 @@ private:
     void swap(Json & other);
 
 private:
-    //结构体中各成员变量共用内存空间，结构体内存空间的大小为最大成员变量占用内存空间的大小
-    //因为结构体在某一时刻只能存储一种类型，因此可以节省内存空间(几乎是与结构体的唯一区别)
-    //为了极致节省内存空间，对于容器类型，使用指针来存储，这样只需要8个字节(对于本系统而言)
+    //联合体中各成员变量共用内存空间，联合体内存空间的大小为最大成员变量占用内存空间的大小
+    //因为联合体在某一时刻只能存储一种类型，因此可以节省内存空间(几乎是与结构体的唯一区别)
+    //为了极致节省内存空间，对于容器类型，使用指针来存储，这样只需要24(=3*8)个字节(对于本系统而言)
     union Value
     {
         bool m_bool;
@@ -141,6 +150,7 @@ private:
         std::vector<Json> *m_array;
         std::map<string, Json> *m_object;
     };
+    //联合体对成员的索引方法同结构体，使用.运算符
 
     //对于任一JSON字段，只有类型与内容两种属性，因此定义枚举类型存储字段类型，用联合体类型存储字段内容
     Type m_type;

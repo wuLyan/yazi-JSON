@@ -25,17 +25,17 @@ int main()
     // std::cout << v.str() << std::endl;
     // return 0;
 
-    Json v1 = true;
-    Json v2 = 123;
-    Json v3 = 1.23;
-    Json v4 = "hello world";
-    const string & s = v4;
-    std::cout << s << std::endl;
-    std::cout << v1.str() << std::endl;
-    std::cout << v2.str() << std::endl;
-    std::cout << v3.str() << std::endl;
-    std::cout << v4.str() << std::endl;
-    return 0;
+    // Json v1 = true;
+    // Json v2 = 123;
+    // Json v3 = 1.23;
+    // Json v4 = "hello world";
+    // const string & s = v4;
+    // std::cout << s << std::endl;
+    // std::cout << v1.str() << std::endl;
+    // std::cout << v2.str() << std::endl;
+    // std::cout << v3.str() << std::endl;
+    // std::cout << v4.str() << std::endl;
+    // return 0;
 
     //Json类型转换为基本数据类型
     // bool b = v1;
@@ -47,7 +47,7 @@ int main()
     // std::cout << null.str() << std::endl;
     // return 0;
 
-    // array value
+    // array value;
     // Json arr;
     // arr.append(123);
     // arr.append(1.23);
@@ -60,7 +60,7 @@ int main()
     // Json obj;
     // obj["name"] = "jun";
     // obj["age"] = 18;
-    // obj["arr"] = arr;
+    // obj["arr"] = arr; //Json对象的嵌套，注意不要重复释放内存，只需释放一次：obj.clear();
     // std::cout << obj.str() << std::endl;
     // obj.clear();
     // return 0;
