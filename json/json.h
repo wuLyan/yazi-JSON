@@ -34,7 +34,7 @@ public:
         json_object     // object value
     };
 
-    Json();
+    Json(); //不提供任何形参的默认构造函数
     Json(Type type); //根据枚举类型变量初始化Json对象
     Json(bool value);
     Json(int value);

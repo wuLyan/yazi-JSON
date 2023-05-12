@@ -14,7 +14,7 @@ main.json
 ```
 
 main.cpp
-```c++
+```C++
 #include <iostream>
 #include <fstream>
 #include <sstream>
