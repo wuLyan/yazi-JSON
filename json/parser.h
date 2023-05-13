@@ -38,8 +38,8 @@ private:
     }
 
 private:
-    string m_str; //待解析的字符串
-    size_t m_idx; //当前解析的位置/下标索引
+    string m_str; //先把待处理的文件中的内容全部看成字符串，再从字符串中具体分离不同字段类型
+    size_t m_idx; //当前解析的字符位置/下标索引
 };
 
 }}
