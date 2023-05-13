@@ -16,16 +16,29 @@ using namespace yazi::json;
 
 int main()
 {
-    // ifstream fin("./main.json");
-    // stringstream ss;
-    // ss << fin.rdbuf();
-    // const string & data = ss.str();
-    // Json v;
-    // v.parse(data);
-    // std::cout << v.str() << std::endl;
-    // return 0;
+    /* 对*.json文件的理解：
+        1) 首先整个文件本身就是一个Json对象，因为文件以 { 开头，以 } 结尾，这个Json对象的字段类型为json_object
+        2) Json文件中可以实现多层嵌套，所以这就决定了当处理字段类型为json_object和json_vector的Json对象时，成员函数的实现要依靠递归调用
+        3) 看了*.json文件格式就会明白为什么在进行解析时要对空白字符(空格、回车、换行、指标)进行处理，为什么不同的解析函数获取下一个待解析字符的操作不同
+    */
+    ifstream fin("./test.json"); //创建一个文件输入流对象，并将其与main.json文件关联起来
+    stringstream ss; //创建一个字符串流对象
 
-    // NOTE：因为构造函数并没有声明为explicit，所以可以进行拷贝初始化来构造Json对象
+    // HINT：ifstream类的成员函数rdbuf()返回一个指向内部 filebuf 对象的指针，将文件输入流对象fin中的数据读取到字符串流对象ss中
+    ss << fin.rdbuf();
+    const string & data = ss.str(); //返回字符串流对象ss所保存的string对象的拷贝
+
+    Json v;
+    v.parse(data);
+    std::cout << v.str() << std::endl;
+
+    // 这里要用到Json对象向基本数据类型的转换，从索引方式可以看到Json对象存在多层嵌套
+    bool isLogin = v["data"]["isLogin"];
+    int current_level = v["data"]["level_info"]["current_level"];
+
+    return 0;
+
+    // NOTE：因为构造函数在声明时并没有使用关键字explicit，所以可以进行拷贝初始化来构造Json对象
     // Json v1 = true;
     // Json v2 = 123;
     // Json v3 = 1.23;
