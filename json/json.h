@@ -15,19 +15,19 @@ using std::ostream;
     2) 当某一行都是注释时，注释符号与注释内容之间要留一个空格；当注释内容与代码混合时，注释符号与注释内容之间不要留空格，在注释符号与代码之间留空格即可
 */
 
-//创建新的声明区域，防止命名冲突
+// 创建新的声明区域，防止命名冲突
 namespace yazi {
 namespace json {
 
 class Json
 {
 public:
-    //使用枚举来定义符号常量
+    // 使用枚举来定义符号常量,Type是新类型名，其中包含七个枚举常量
     enum Type
     {
         json_null = 0,  // null value
         json_bool,      // bool value
-        //为了更具体且方便使用，对于number类型区分整数和浮点数
+        // 为了更具体且方便使用，对于number类型区分整数和浮点数
         json_int,       // integer value
         json_double,    // double value
         json_string,    // string value
@@ -42,7 +42,7 @@ public:
     Json(double value);
     Json(const char *value); //支持C语言风格字符串初始化的构造函数
     Json(const string &value); //支持C++ string类型初始化的构造函数
-    Json(const Json &other); //复制构造函数
+    Json(const Json &other); //拷贝构造函数
     Json(Json && other);
     ~Json(); //析构函数
 
@@ -151,7 +151,7 @@ private:
 private:
     // 联合体中各成员变量共用内存空间，联合体内存空间的大小为最大成员变量占用内存空间的大小
     // 因为联合体在某一时刻只能存储一种类型，因此可以节省内存空间(几乎是与结构体的唯一区别)
-    // NOTE：为了极致节省内存空间，对于容器类型，使用指针来存储，这样只需要24(=3*8)个字节(对于本系统而言)
+    // NOTE：为了极致节省内存空间，对于容器类型，使用指针来存储，这样只需要8个字节(对于本系统而言)
     union Value
     {
         bool m_bool;

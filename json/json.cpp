@@ -5,7 +5,7 @@ using std::stringstream;
 
 #include <json/json.h>
 #include <json/parser.h>
-using namespace yazi::json; //引入自定义的命名空间
+using namespace yazi::json; //只包含头文件不行，必须再引入自定义的命名空间
 
 /* Tips：
     1) 
@@ -16,6 +16,7 @@ using namespace yazi::json; //引入自定义的命名空间
 Json::Json() : m_type(json_null) //养成好习惯，一旦有自定义构造函数，顺手多加一个默认构造函数
 {
 }
+// 初始化列表中进行的操作是使用枚举量为枚举类型的变量赋值
 
 // 涉及到构造函数的重载(形参数目与形参类型不同)，根据形参列表的不同选择调用不同的构造函数
 // 接受一个参数的构造函数是转换构造函数，可以在声明时使用关键字explicit防止隐式转换，但这里没有使用
@@ -39,7 +40,7 @@ Json::Json(Type type) : m_type(type) //根据字段类型创建Json对象，字�
             m_value.m_string = new string("");
             break;
         case json_array:
-            m_value.m_array = new std::vector<Json>();
+            m_value.m_array = new std::vector<Json>(); //这里在初始化时还会调用Json类的默认构造函数
             break;
         case json_object:
             m_value.m_object = new std::map<string, Json>();
@@ -48,7 +49,7 @@ Json::Json(Type type) : m_type(type) //根据字段类型创建Json对象，字�
     }
 }
 
-// 使用成员初始化列表的方式初始化枚举类型变量
+// 在成员初始化列表中使用枚举量初始化枚举类型的变量
 // 使用成员运算符的方式初始化联合体类型变量
 Json::Json(bool value) : m_type(json_bool)
 {
@@ -73,7 +74,7 @@ Json::Json(const char * value) : m_type(json_string)
 Json::Json(const string & value) : m_type(json_string)
 {
     m_value.m_string = new string(value);
-    //与上一个Json构造函数在开辟内存空间时调用了不同的string构造函数
+    // 与上一个Json构造函数在开辟内存空间时调用了不同的string构造函数
 }
 
 // HINT：对于json_array、json_object字段类型，并没有转化构造函数
@@ -171,7 +172,7 @@ string Json::as_string() const
 }
 
 // NOTE：对于指针类型的成员变量全部执行深拷贝
-void Json::copy(const Json & other)
+void Json::copy(const Json &other)
 {
     clear();
     m_type = other.m_type;
@@ -181,7 +182,7 @@ void Json::copy(const Json & other)
         case json_bool:
         case json_int:
         case json_double:
-            m_value = other.m_value;
+            m_value = other.m_value; //对于内置类型的变量，无需考虑拷贝过程中的内存问题，因此都可以归为一类
             break;
         case json_string:
             {
