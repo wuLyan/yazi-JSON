@@ -5,7 +5,7 @@ using std::stringstream;
 
 #include <json/json.h>
 #include <json/parser.h>
-using namespace yazi::json; //只包含头文件不行，必须再引入自定义的命名空间
+using namespace yazi::json; //不能只包含头文件，必须再引入自定义的命名空间
 
 /* Tips：
     1) 
@@ -16,10 +16,10 @@ using namespace yazi::json; //只包含头文件不行，必须再引入自定�
 Json::Json() : m_type(json_null) //养成好习惯，一旦有自定义构造函数，顺手多加一个默认构造函数
 {
 }
-// 初始化列表中进行的操作是使用枚举量为枚举类型的变量赋值
+// 初始化列表中进行的操作是使用枚举量初始化枚举类型的变量(注意不是赋值)
 
 // 涉及到构造函数的重载(形参数目与形参类型不同)，根据形参列表的不同选择调用不同的构造函数
-// 接受一个参数的构造函数是转换构造函数，可以在声明时使用关键字explicit防止隐式转换，但这里没有使用
+// 接收一个参数的构造函数是转换构造函数，可以在声明时使用关键字explicit禁止隐式类型转换，但这里没有使用
 Json::Json(Type type) : m_type(type) //根据字段类型创建Json对象，字段内容分别执行对应内置数据类型的值初始化/类的默认构造函数
 {
     // switch语句的case标签可以使用枚举类型，但别忘记每种case都要有break语句，否则会顺次case执行下去
@@ -74,11 +74,11 @@ Json::Json(const char * value) : m_type(json_string)
 Json::Json(const string & value) : m_type(json_string)
 {
     m_value.m_string = new string(value);
-    // 与上一个Json构造函数在开辟内存空间时调用了不同的string构造函数
+    // 因为传入的实参类型不同，所以与上一个Json转换构造函数在开辟内存空间时调用了不同的string构造函数
 }
 
-// HINT：对于json_array、json_object字段类型，并没有转化构造函数
-// HINT：都是先调用默认构造函数之后再使用成员函数append(json_array字段类型)或重载的运算符[](json_object字段类型)来添加元素
+// HINT：对于json_array、json_object字段类型，并没有转化构造函数，因为并不能只用单一参数构造，这两种类型是实现嵌套的数据类型
+// HINT：都是先调用默认构造函数之后再使用成员函数append(json_array字段类型)或重载的运算符[](json_object、json_array字段类型)来添加元素
 
 Json::Json(const Json & other) : m_type(json_null)
 {
@@ -141,7 +141,7 @@ bool Json::as_bool() const
     {
         return m_value.m_bool;
     }
-    throw std::logic_error("function Json::asBool value type error");
+    throw new std::logic_error("function Json::as_bool value type error");
 }
 
 int Json::as_int() const
@@ -150,7 +150,7 @@ int Json::as_int() const
     {
         return m_value.m_int;
     }
-    throw std::logic_error("function Json::asInt value type error");
+    throw new std::logic_error("function Json::as_int value type error");
 }
 
 double Json::as_double() const
@@ -159,7 +159,7 @@ double Json::as_double() const
     {
         return m_value.m_double;
     }
-    throw std::logic_error("function Json::asDouble value type error");
+    throw new std::logic_error("function Json::as_double value type error");
 }
 
 string Json::as_string() const
@@ -168,7 +168,7 @@ string Json::as_string() const
     {
         return *(m_value.m_string);
     }
-    throw std::logic_error("function Json::asString value type error");
+    throw std::logic_error("function Json::as_string value type error");
 }
 
 // NOTE：对于指针类型的成员变量全部执行深拷贝，因此释放时对于Json类型对象的嵌套也都要分别释放
@@ -182,7 +182,7 @@ void Json::copy(const Json &other)
         case json_bool:
         case json_int:
         case json_double:
-            m_value = other.m_value; //对于内置类型的变量，无需考虑拷贝过程中的内存问题，因此都可以归为一类
+            m_value = other.m_value; //对于内置类型的变量，无需考虑拷贝过程中的内存问题，因此都可以归为一类，一路贯通
             break;
         case json_string:
             {
@@ -196,10 +196,10 @@ void Json::copy(const Json &other)
             {
                 if (other.m_value.m_array != nullptr)
                 {
-                    m_value.m_array = new std::vector<Json>();
+                    m_value.m_array = new std::vector<Json>(); //重新开辟内存空间
                     for (auto it = (other.m_value.m_array)->begin(); it != (other.m_value.m_array)->end(); it++)
                     {
-                        m_value.m_array->push_back(*it);
+                        m_value.m_array->push_back(*it); //调用拷贝构造函数
                     }
                 }
             }
@@ -208,7 +208,7 @@ void Json::copy(const Json &other)
             {
                 if (other.m_value.m_object != nullptr)
                 {
-                    m_value.m_object = new std::map<string, Json>();
+                    m_value.m_object = new std::map<string, Json>(); //重新开辟内存空间
                     for (auto it = (other.m_value.m_object)->begin(); it != (other.m_value.m_object)->end(); it++)
                     {
                         (*(m_value.m_object))[it->first] = it->second; //通过map中重载运算符[]实现添加元素的功能
@@ -234,7 +234,7 @@ void Json::swap(Json & other)
 
 int Json::size() const
 {
-    switch (m_type)
+    switch (m_type) //只有特定的类型才能获取size
     {
         case json_array:
             return (m_value.m_array)->size();
@@ -270,7 +270,7 @@ void Json::clear()
         case json_bool:
         case json_int:
         case json_double:
-            break;
+            break; //前四种字段类型之中没有指针，所以可以一路贯通
         case json_string:
             {
                 if (m_value.m_string != nullptr)
@@ -302,7 +302,7 @@ void Json::clear()
                 {
                     for (auto it = (m_value.m_object)->begin(); it != (m_value.m_object)->end(); it++)
                     {
-                        it->second.clear(); //HINT：递归调用，因为pair中第二个类型是Json类型
+                        (it->second).clear(); //HINT：递归调用，因为pair中第二个类型是Json类型(嵌套)
                     }
                     delete m_value.m_object;
                     m_value.m_object = nullptr;
@@ -328,7 +328,7 @@ bool Json::has(int index) const
 bool Json::has(const char * key) const
 {
     string name(key);
-    return has(name);
+    return has(name); //调用另一个成员函数，实现代码复用
 }
 
 bool Json::has(const string & key) const
@@ -338,7 +338,7 @@ bool Json::has(const string & key) const
         return false;
     }
     return (m_value.m_object)->find(key) != (m_value.m_object)->end();
-    // 当find()函数找不到key时，返回的是end()迭代器
+    // 当find()函数找不到key时，返回的是end()迭代器，也即上述语句返回true时所给key存在
 }
 
 Json Json::get(int index) const
@@ -380,7 +380,7 @@ void Json::remove(int index)
         return;
     }
     (m_value.m_array)->at(index).clear(); 
-    // 成员函数at()返回下标为index的元素的引用，因为vector中存放的是Json类型的对象(可能会有嵌套)
+    // 成员函数at()返回下标为index的元素的引用，因为vector中存放的是Json类型的对象(有嵌套)
     // 所以再调用库函数erase()之前要调用本类成员函数clear()先释放内存
     (m_value.m_array)->erase((m_value.m_array)->begin() + index);
 }
@@ -388,7 +388,7 @@ void Json::remove(int index)
 void Json::remove(const char * key)
 {
     string name = key;
-    remove(name);
+    remove(name); //调用另一个成员函数，实现代码复用
 }
 
 void Json::remove(const string & key)
@@ -408,13 +408,13 @@ void Json::remove(const string & key)
 
 void Json::append(const Json & value)
 {
-    if (m_type != json_array)
+    if (m_type != json_array) //有可能是调用默认构造函数创建的对象，所以类型有可能还没有设置成json_array
     {
         clear();
-        m_type = json_array; //只有类型为json_array的对象才会调用这个成员函数，所以可以这样粗暴操作
-        m_value.m_array = new std::vector<Json>();
+        m_type = json_array; //只有类型为json_array的对象才能调用这个成员函数，所以可以这样粗暴操作
+        m_value.m_array = new std::vector<Json>(); //开辟新的内存空间
     }
-    (m_value.m_array)->push_back(value);
+    (m_value.m_array)->push_back(value); //调用拷贝构造函数
 }
 
 void Json::append(Json && value)
@@ -425,7 +425,7 @@ void Json::append(Json && value)
         m_type = json_array;
         m_value.m_array = new std::vector<Json>();
     }
-    (m_value.m_array)->push_back(std::move(value));
+    (m_value.m_array)->push_back(std::move(value)); //调用移动构造函数
 }
 
 Json & Json::operator = (const Json & other)
@@ -441,6 +441,8 @@ Json & Json::operator = (Json && other)
     return *this;
 }
 
+// HINT：只通过比较指针是否相同就可以判断两个对象是否相等了吗？万一是不同的指针指向了不同的内存空间，但空间中的内容是一样的呢？
+// HINT：
 bool Json::operator == (const Json & other)
 {
     if (m_type != other.type())
@@ -478,16 +480,16 @@ Json & Json::operator [] (int index)
 {
     if (m_type != json_array) //只有字段类型为json_array的对象才能使用[index]的下标访问方式
     {
-        throw std::logic_error("function [] not an array");
+        throw new std::logic_error("function [] not an array");
     }
     if (index < 0)
     {
-        throw std::logic_error("function [] index less than 0");
+        throw new std::logic_error("function [] index less than 0");
     }
     int size = (m_value.m_array)->size(); //获取vector的大小
     if (index >= size)
     {
-        throw std::logic_error("function [] out of range");
+        throw new std::logic_error("function [] out of range");
     }
     return (*(m_value.m_array))[index]; //vector容器本身有[]运算符重载
 }
@@ -504,7 +506,7 @@ Json & Json::operator [] (const string & key)
     if (m_type != json_object)
     {
         // HINT：为什么这个函数中的字段类型不匹配不会直接抛出异常？
-        // HINT：因为这个函数是用来添加新的字段的，如果字段类型不匹配，那么就需要清空原有的字段，然后添加新的字段
+        // HINT：因为这个函数还有一个功能是用来添加新的字段的，如果字段类型不匹配，那么就需要清空原有的字段，然后添加新的字段
         clear();
         m_type = json_object;
         m_value.m_object = new std::map<string, Json>();
@@ -514,29 +516,29 @@ Json & Json::operator [] (const string & key)
     // HINT：当创建一个新的元素插入到map中时，关联值将进行值初始化，因此接下来会调用默认构造函数，创建一个空Json对象
 }
 
-Json::operator bool()
+Json::operator bool() const
 {
     if (m_type != json_bool)
     {
-        throw std::logic_error("function Json::operator (bool) requires bool value");
+        throw new std::logic_error("function Json::operator (bool) requires bool value");
     }
     return m_value.m_bool;
 }
 
-Json::operator int()
+Json::operator int() const
 {
     if (m_type != json_int)
     {
-        throw std::logic_error("function Json::operator (int) requires int value");
+        throw new std::logic_error("function Json::operator (int) requires int value");
     }
     return m_value.m_int;
 }
 
-Json::operator double()
+Json::operator double() const
 {
     if (m_type != json_double)
     {
-        throw std::logic_error("function Json::operator (double) requires double value");
+        throw new std::logic_error("function Json::operator (double) requires double value");
     }
     return m_value.m_double;
 }
@@ -545,7 +547,7 @@ Json::operator string()
 {
     if (m_type != json_string)
     {
-        throw std::logic_error("function Json::operator (string) requires string value");
+        throw new std::logic_error("function Json::operator (string) requires string value");
     }
     return *(m_value.m_string); //这里与上面稍有区别，因为存放的是指针，所以要解引用
 }
@@ -561,15 +563,15 @@ Json::operator string() const
 
 void Json::parse(const string & str)
 {
-    // HINT：当需要访问一个类的非公有成员时才需要声明友元类，这里只是定义类的对象所以不需要
+    // HINT：当需要访问一个类的非公有成员时才需要声明友元类，这里只是定义类的对象所以不需要，但需要包含头文件
     Parser parser;
     parser.load(str);
-    *this = parser.parse();
+    *this = parser.parse(); //调用赋值运算符
 }
 
 string Json::str() const
 {
-    // HINT：使用ostringstream类，可以方便地进行字符串拼接(主要是为了应对字段类型为json_array和json_object的对象)
+    // HINT：使用stringstream类，可以方便地进行字符串拼接(主要是为了应对字段类型为json_array和json_object的对象)
     stringstream ss; //既可从string读数据，也可向string写数据
     switch (m_type)
     {
@@ -619,7 +621,7 @@ string Json::str() const
                     {
                         ss << ",";
                     }
-                    ss << "\"" << it->first << "\":" << it->second.str(); //HINT：递归调用，虽然迭代器指向的是pair类型，因为pair中value类型是Json类型
+                    ss << "\"" << it->first << "\":" << it->second.str(); //HINT：递归调用，虽然迭代器指向的是pair类型，但pair中value类型是Json类型
                 }
                 ss << "}";
             }

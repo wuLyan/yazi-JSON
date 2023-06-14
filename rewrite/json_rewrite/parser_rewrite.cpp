@@ -1,4 +1,5 @@
 #include "parser_rewrite.h"
+#include  <string>
 
 using namespace yazi_rewrite::json_rewrite;
 
@@ -52,7 +53,7 @@ JsonRe ParserRe::parse()
         default:
             break;
     }
-    throw std::logic_error("unexpected character in parse json");
+    throw new std::logic_error("unexpected character in parse json");
 }
 
 void ParserRe::skip_white_space()
@@ -71,30 +72,175 @@ char ParserRe::get_next_token()
 
 JsonRe ParserRe::parse_null()
 {
-    return JsonRe();
+    if (m_str.compare(m_idx, 4, "null") == 0)
+    {
+        m_idx += 4;
+        return JsonRe();
+    }
+    throw new std::logic_error("parse null error");
 }
 
 JsonRe ParserRe::parse_bool()
 {
-    return JsonRe();
+    if (m_str.compare(m_idx, 4, "true") == 0)
+    {
+        m_idx += 4;
+        return JsonRe(true);
+    }
+    else if (m_str.compare(m_idx, 5, "false") == 0)
+    {
+        m_idx += 5;
+        return JsonRe(false);
+    }
+    throw new std::logic_error("parse bool error");
 }
 
 JsonRe ParserRe::parse_number()
 {
-    return JsonRe();
+    int pos = m_idx;
+    if (m_str[m_idx] == '-')
+    {
+        m_idx ++;
+    }
+    if (m_str[m_idx] < '0' || m_str[m_idx] > '9')
+    {
+        throw new std::logic_error("parse number error");
+    }
+    while (m_str[m_idx] >= '0' && m_str[m_idx] <= '9')
+    {
+        m_idx ++;
+    }
+    if (m_str[m_idx] != '.')
+    {
+        int i = std::atoi(m_str.c_str() + pos);
+        return JsonRe(i);
+    }
+    m_idx ++;
+    if (m_str[m_idx] < '0' || m_str[m_idx] > '9')
+    {
+        throw new std::logic_error("parse number error");
+    }
+    while (m_str[m_idx] >= '0' && m_str[m_idx] <= '9')
+    {
+        m_idx ++;
+    }
+    double f = std::atof(m_str.c_str() + pos);
+    return JsonRe(f);
 }
 
 std::string ParserRe::parse_string()
 {
-    return std::string();
+    std::string out;
+    while (true)
+    {
+        char ch = m_str[m_idx ++];
+        if (ch == '"')
+        {
+            break;
+        }
+        if (ch =='\\')
+        {
+            ch = m_str[m_idx ++];
+            switch (ch)
+            {
+                case '\n':
+                    out += '\n';
+                    break;
+                case '\r':
+                    out += '\r';
+                    break;
+                case '\t':
+                    out += '\t';
+                    break;
+                case '\b':
+                    out += '\b';
+                    break;
+                case '\f':
+                    out += '\f';
+                    break;
+                case '"':
+                    out += "\\\"";
+                    break;
+                case '\\':
+                    out += "\\\\";
+                    break;
+                case 'u':
+                    out += "\\u";
+                    for (int i = 0; i < 4; i ++)
+                    {
+                        out += m_str[m_idx ++];
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        else
+        {
+            out += ch;
+        }
+    }
+    return out;
 }
 
 JsonRe ParserRe::parse_array()
 {
-    return JsonRe();
+    JsonRe arr(JsonRe::json_array);
+    char ch = get_next_token();
+    if (ch == ']')
+    {
+        return arr;
+    }
+    m_idx --;
+    while (true)
+    {
+        arr.append(parse());
+        ch = get_next_token();
+        if (ch == ']')
+        {
+            break;
+        }
+        if (ch != ',')
+        {
+            throw new std::logic_error("parse array error");
+        }
+        m_idx ++;
+    }
+    return arr;
 }
 
 JsonRe ParserRe::parse_object()
 {
-    return JsonRe();
+    JsonRe obj(JsonRe::json_object);
+    char ch = get_next_token();
+    if (ch == '}')
+    {
+        return obj;
+    }
+    m_idx --;
+    while (true)
+    {
+        ch = get_next_token();
+        if (ch != '"')
+        {
+            throw new std::logic_error("parse object error");
+        }
+        std::string key = parse_string();
+        ch = get_next_token();
+        if (ch != ':')
+        {
+            throw new std::logic_error("parse object error");
+        }
+        obj[key] = parse();
+        ch = get_next_token();
+        if (ch == '}')
+        {
+            break;
+        }
+        if (ch != ',')
+        {
+            throw new std::logic_error("parse object error");
+        }
+    }
+    return obj;
 }

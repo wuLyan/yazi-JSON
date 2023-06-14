@@ -25,7 +25,7 @@ JsonRe::JsonRe(double value) : m_type(json_double)
     m_value.m_double = value;
 }
 
-JsonRe::JsonRe(const char *value) : m_type(json_string)
+JsonRe::JsonRe(const char * value) : m_type(json_string)
 {
     m_value.m_string = new std::string(value);
 }
@@ -123,7 +123,7 @@ JsonRe & JsonRe::operator[](int index)
             (m_value.m_array)->push_back(JsonRe());
         }
     }
-    // 这是视频版本的代码，感觉这里的逻辑存在问题
+    // 这是视频版本的代码，感觉上面代码逻辑存在问题，索引超出长度之后应该直接抛异常
     return (m_value.m_array)->at(index);
 }
 
@@ -144,6 +144,7 @@ JsonRe & JsonRe::operator [] (const std::string & key)
     return (*(m_value.m_object))[key]; 
 }
 
+// 重载赋值运算符，函数的返回类型居然不是类型的引用，很迷！！！
 void JsonRe::operator = (const JsonRe & other)
 {
     clear(); //避免内存泄漏

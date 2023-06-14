@@ -1,11 +1,14 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include "json_rewrite/json_rewrite.h" //包含不在当前目录下的头文件时，要使用相对路径或绝对路径
-
+// 包含每一个头文件都要思路清晰，不要一股脑都包含进来，否则会造成循环引用
 using namespace std;
 using namespace yazi_rewrite::json_rewrite;
 
 /* Tips:
-    1) g++ main_rewrite.cpp json_rewrite/json_rewrite.cpp json_rewrite/json_rewrite.h json_rewrite/parser_rewrite.h json_rewrite/parser_rewrite.cpp -o main
+    1) 视频版本代码支持在VSCode下编译运行，编译连接命令如下：
+        g++ main_rewrite.cpp json_rewrite/json_rewrite.cpp json_rewrite/json_rewrite.h json_rewrite/parser_rewrite.h json_rewrite/parser_rewrite.cpp -o main
     2) 为了防止类名称空间冲突，将类改名为JsonRe，文件名添加后缀_rewrite
 */
 
@@ -57,9 +60,27 @@ int main()
     // cout << obj.str() << endl;
     // obj.clear();
 
-    const string & str = "null";
+    // const string & str = "{\"a\": 1, \"b\": 2, \"c\": 3}";
+    // JsonRe v;
+    // v.parse(str);
+    // cout << v.str() << endl;
+
+    ifstream fin("../test.json");
+    stringstream ss;
+    ss << fin.rdbuf();
+    const string & str = ss.str();
+
     JsonRe v;
     v.parse(str);
+    cout << v.str() << endl;
+
+    // cout << "--------------" << endl;
+
+    // bool isLogin = v["data"]["isLogin"];
+    // cout << isLogin << endl;
+
+    // int current_level = v["data"]["level_info"]["current_level"];
+    // cout << current_level << endl;
 
     return 0;
 }

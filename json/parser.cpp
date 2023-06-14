@@ -29,7 +29,7 @@ char Parser::get_next_token()
 {
     skip_white_space();
     if (m_idx == m_str.size())
-        throw std::logic_error("unexpected end of input");
+        throw new std::logic_error("unexpected end of input");
     return m_str[m_idx++]; //在函数结束时实际上m_idx指向待解析字符串中第二个非空白字符
 }
 
@@ -68,10 +68,10 @@ Json Parser::parse()
         default:
             break;
     }
-    throw std::logic_error("unexpected character in parse json");
+    throw new std::logic_error("unexpected character in parse json");
 }
 
-// NOTE：当Json对象的字段类型为json_null、json_bool、json_int、json_double、json_string时，解析函数可以直接在 return 语句中调用构造函数创建匿名对象返回
+// NOTE：当Json对象的字段类型为json_null、json_bool、json_int、json_double、json_string时，解析函数可以直接在return语句中调用构造函数创建匿名对象返回
 // NOTE：但是当Json对象的字段类型为json_array、json_object时，因为这些容器之中存放的还可能是Json对象，也就是实现了Json对象的嵌套，所以必须先通过字段类型创建空对象，然后逐个解析其中的元素向容器中插入
 
 Json Parser::parse_null()
@@ -83,7 +83,7 @@ Json Parser::parse_null()
     if (m_str.compare(m_idx, 4, "null") == 0)
     {
         m_idx += 4;
-        return Json();
+        return Json(); //调用默认构造函数
     }
     throw std::logic_error("parse null error");
 }
@@ -126,14 +126,14 @@ Json Parser::parse_number()
     }
     else
     {
-        throw std::logic_error("invalid character in number");
+        throw new std::logic_error("invalid character in number");
     }
 
     if (m_str[m_idx] != '.')
     {
         return Json(std::atoi(m_str.c_str() + pos));
         // HINT：c_str()函数将C++的string对象转化为C的字符串数组，即最后返回const char *类型的变量
-        // HINT：但是因为可能前面跳过了某些空白字符，需要加上解析开始的位置，直到'\0'才是真正需要进行转换的数字(含正负号)
+        // HINT：但是因为可能前面跳过了某些空白字符，需要加上解析开始的位置才是有效内容，然后直到'\0'才是真正需要进行转换的数字(含正负号)
     }
 
     // decimal part(小数部分)
@@ -141,7 +141,7 @@ Json Parser::parse_number()
     m_idx++; //跳过小数点
     if (!in_range(m_str[m_idx], '0', '9'))
     {
-        throw std::logic_error("at least one digit required in fractional part");
+        throw new std::logic_error("at least one digit required in fractional part");
     }
     while (in_range(m_str[m_idx], '0', '9'))
     {
@@ -158,11 +158,11 @@ string Parser::parse_string()
     {
         if (m_idx == m_str.size())
         {
-            throw std::logic_error("unexpected end of input in string");
+            throw new std::logic_error("unexpected end of input in string");
         }
 
         char ch = m_str[m_idx++];
-        if (ch == '"')
+        if (ch == '"') //找到了右双引号，说明此时到达了字符串的末尾
         {
             break; //跳出循环
         }
@@ -199,7 +199,7 @@ Json Parser::parse_array()
     // NOTE：否则会使得空白字符算入下一个待解析字符的一部分，进而造成解析逻辑错误，在函数parse_object()中同理
     Json arr(Json::json_array);
     char ch = get_next_token();
-    if (ch == ']')
+    if (ch == ']') //已到达vector末尾
     {
         return arr;
     }
@@ -208,13 +208,13 @@ Json Parser::parse_array()
     {
         arr.append(parse()); //arr中存放的是Json对象，所以递归调用函数进行解析
         ch = get_next_token();
-        if (ch == ']') //判断这次循环解析是否到达了 vector 的结尾，若条件成立，则结束解析(break跳出当前循环)
+        if (ch == ']') //判断这次循环解析是否到达了vector的结尾，若条件成立，则结束解析(break跳出当前循环)
         {
             break;
         }
         if (ch != ',') //若这次循环解析没有到达结尾，则期望元素之间使用逗号进行分隔
         {
-            throw std::logic_error("expected ',' in array");
+            throw new std::logic_error("expected ',' in array");
         }
     }
     return arr;
@@ -246,7 +246,7 @@ Json Parser::parse_object()
         }
         obj[key] = parse(); //解析value并向map中插入
         ch = get_next_token();
-        if (ch == '}') //判断这次循环解析是否到达了 map 的结尾，若条件成立，则结束解析(break跳出当前循环)
+        if (ch == '}') //判断这次循环解析是否到达了map的结尾，若条件成立，则结束解析(break跳出当前循环)
         {
             break;
         }

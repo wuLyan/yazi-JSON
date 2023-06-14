@@ -23,7 +23,7 @@ private:
     // 获取下一个字符
     char get_next_token();
 
-    // 分别按照字段类型进行解析的私有成员函数
+    // 分别按照字段类型进行解析的私有成员函数，只会被成员函数parse()调用，所以可以设为private
     Json parse_null();
     Json parse_bool();
     Json parse_number();

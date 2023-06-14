@@ -18,10 +18,10 @@ int main()
 {
     /* 对*.json文件的理解：
         1) 首先整个文件本身就是一个Json对象，因为文件以 { 开头，以 } 结尾，这个Json对象的字段类型为json_object
-        2) Json文件中可以实现多层嵌套，所以这就决定了当处理字段类型为json_object和json_vector的Json对象时，成员函数的实现要依靠递归调用
+        2) Json文件中可以实现多层嵌套，所以这就决定了当解析/转换字段类型为json_object和json_vector的Json对象时，成员函数的实现要依靠递归调用
         3) 看了*.json文件格式就会明白为什么在进行解析时要对空白字符(空格、回车、换行、指标)进行处理，为什么不同的解析函数获取下一个待解析字符的操作不同
     */
-    ifstream fin("./test.json"); //创建一个文件输入流对象，并将其与main.json文件关联起来
+    ifstream fin("./test.json"); //创建一个文件输入流对象，并将其与test.json文件关联起来
     stringstream ss; //创建一个字符串流对象
 
     // HINT：ifstream类的成员函数rdbuf()返回一个指向内部 filebuf 对象的指针，将文件输入流对象fin中的数据读取到字符串流对象ss中

@@ -40,11 +40,11 @@ public:
     Json(bool value);
     Json(int value);
     Json(double value);
-    Json(const char *value); //支持C语言风格字符串初始化的构造函数
-    Json(const string &value); //支持C++ string类型初始化的构造函数
-    Json(const Json &other); //拷贝构造函数
-    Json(Json && other);
-    ~Json(); //析构函数
+    Json(const char *value); //支持C语言风格字符串初始化的转换构造函数
+    Json(const string &value); //支持C++ string类型初始化的转换构造函数
+    Json(const Json &other); //拷贝构造函数，第一个参数是const的左值引用
+    Json(Json && other); //移动构造函数，第二个参数是非const的右值引用
+    ~Json(); //类中包含有动态分配的资源，所以必须有析构函数
 
     // 获取字段类型
     Type type() const;
@@ -63,6 +63,7 @@ public:
     int as_int() const;
     double as_double() const;
     string as_string() const;
+    // 上述四个函数与类型转换运算符的功能相同，其实可以删掉的，不过函数名更能表达出要实现的功能
 
     // number of values in array or object(获取数组或对象容器中的元素个数)
     int size() const;
@@ -119,12 +120,13 @@ public:
 
     // 转换构造函数，实现基本数据类型向Json类型的转换
     // 类型转换运算符，实现Json类型向基本数据类型的转换
-    operator bool();
-    operator int();
-    operator double();
+    operator bool() const;
+    operator int() const;
+    operator double() const;
     operator string();
-    operator string() const;
+    operator string() const; //是否是const的成员函数，也会构成函数重载
     // 类型转换运算符函数必须是类的const成员函数，不能声明返回类型，形参列表也必须为空
+    // 虽然没有声明返回类型，但却可以有返回值，你说这奇怪不！
 
     // 解析字符串
     void parse(const string & str);
