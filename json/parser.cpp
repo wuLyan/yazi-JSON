@@ -38,7 +38,7 @@ Json Parser::parse()
     char ch = get_next_token();
     switch (ch)
     {
-        // HINT：通过待解析字符串的第一个非空白字符判断字段类型
+        // HINT：通过待解析字符串的第一个非空白字符判断字段类型，然后再分别调用不同字段类型的解析函数
         case 'n':
             m_idx--; //将m_idx回退到待解析字符串中的第一个非空白字符，方便后续分字段类型解析的比较操作
             return parse_null();
@@ -60,7 +60,7 @@ Json Parser::parse()
             m_idx--;
             return parse_number();
         case '"':
-            return Json(parse_string()); //通过解析函数的返回值构造一个匿名Json对象 
+            return Json(parse_string()); //通过解析函数的返回值构造一个匿名Json对象，是个右值/将亡值/临时值，返回时不会调用拷贝构造函数 
         case '[':
             return parse_array();
         case '{':
@@ -72,7 +72,7 @@ Json Parser::parse()
 }
 
 // NOTE：当Json对象的字段类型为json_null、json_bool、json_int、json_double、json_string时，解析函数可以直接在 return 语句中调用构造函数创建匿名对象返回
-// NOTE：但是当Json对象的字段类型为json_array、json_object时，因为这些容器之中存放的还是Json对象，也就是实现了Json对象的嵌套，所以必须先通过字段类型创建空对象，然后逐个解析其中的元素向容器中插入
+// NOTE：但是当Json对象的字段类型为json_array、json_object时，因为这些容器之中存放的还可能是Json对象，也就是实现了Json对象的嵌套，所以必须先通过字段类型创建空对象，然后逐个解析其中的元素向容器中插入
 
 Json Parser::parse_null()
 {

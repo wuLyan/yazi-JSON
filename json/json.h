@@ -68,15 +68,15 @@ public:
     int size() const;
 
     // return true if empty array, empty object, or null, otherwise, false
-    //(当数组为空、对象为空、或者为null时返回true，否则返回false)
+    // (当数组为空、对象为空、或者为null时返回true，否则返回false)
     bool empty() const;
 
     // 释放内存
     void clear();
 
-    //判断vector中是否包含给定索引
+    // 判断vector中是否包含给定索引
     bool has(int index) const;
-    //判断map中是否包含给定key
+    // 判断map中是否包含给定key
     bool has(const char * key) const;
     bool has(const string & key) const;
 
@@ -98,14 +98,14 @@ public:
     Json & operator = (const Json & other);
     Json & operator = (Json && other);
 
-    // 判断两个Json对象是否相等
+    // 判断两个Json对象是否相等或不相等
     bool operator == (const Json & other);
     bool operator != (const Json & other);
 
-    // 重载运算符，实现Json类型的下标访问
+    // 重载下标运算符，实现Json类型的下标访问
     Json & operator [] (int index);
-    Json & operator [] (const char * key);
-    Json & operator [] (const string & key);
+    Json & operator [] (const char * key); //对应实参为C风格的字符串
+    Json & operator [] (const string & key); //对应实参为string类型的对象
 
     // HINT：为了不用创建对象而直接调用函数或符合一般使用习惯(cin >> 、 cout << )，把运算符重载函数声明为类的友元函数
     // HINT：标准输入输出流类istream和ostream中不存在访问权限为public的拷贝构造函数，所以必须返回引用，第一个形参也必须是引用
@@ -117,17 +117,19 @@ public:
         return os;
     }
 
-    // 重载运算符，实现其他数据类型向Json类型的转换
+    // 转换构造函数，实现基本数据类型向Json类型的转换
+    // 类型转换运算符，实现Json类型向基本数据类型的转换
     operator bool();
     operator int();
     operator double();
     operator string();
     operator string() const;
+    // 类型转换运算符函数必须是类的const成员函数，不能声明返回类型，形参列表也必须为空
 
     // 解析字符串
     void parse(const string & str);
 
-    // 以字符串的形式输出Json对象的内容
+    // 以字符串的形式返回Json对象的内容
     string str() const;
 
     typedef std::vector<Json>::iterator iterator; //定义类型别名

@@ -27,7 +27,7 @@ private:
     Json parse_null();
     Json parse_bool();
     Json parse_number();
-    // NOTE：这个解析函数的返回值与其他解析函数不同，因为它的功能要在不同地方使用到
+    // NOTE：这个解析函数的返回值与其他解析函数不同，因为它的功能还要在map中解析key时用到
     string parse_string();
     Json parse_array();
     Json parse_object();

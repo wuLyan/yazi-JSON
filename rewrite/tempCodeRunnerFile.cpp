@@ -1,0 +1,1 @@
+g++ main.cpp json/json.cpp json/json.h -o main

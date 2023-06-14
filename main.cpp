@@ -11,7 +11,7 @@ using namespace yazi::json;
     2) 先按Ctrl + k，再按Ctrl + u，可以取消注释选中的多行代码(Ctrl + k称为先导按键)
     3) 按下Tab键，可以自动缩进选中的多行代码；按下Shift + Tab键，可以反向缩进选中的多行代码
     4) 规范的代码写法：关键字for、if、while后面的左括号前面留空格，与一般的函数调用区分开
-    5) 本项目代码不支持Windows环境下运行，需要在Linux环境下使用makefile编译后运行
+    5) 本项目源码不支持Windows环境下运行，需要在Linux环境下使用makefile编译后运行
 */
 
 int main()

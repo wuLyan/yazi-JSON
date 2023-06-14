@@ -171,7 +171,7 @@ string Json::as_string() const
     throw std::logic_error("function Json::asString value type error");
 }
 
-// NOTE：对于指针类型的成员变量全部执行深拷贝
+// NOTE：对于指针类型的成员变量全部执行深拷贝，因此释放时对于Json类型对象的嵌套也都要分别释放
 void Json::copy(const Json &other)
 {
     clear();
@@ -277,7 +277,7 @@ void Json::clear()
                 {
                     delete m_value.m_string;
                     m_value.m_string = nullptr;
-                    // NOTE：delete释放指针之后还要把指针置为空，这是一套连招
+                    // NOTE：delete释放指针之后还要把指针置为空，这是一套连招，下同
                     // NOTE：具体原因可以参考：E:\JobHunting\C++\C++PrimerCode\exercise\20230318_1.c、20230318_2.cpp
                 }
             }
@@ -292,6 +292,7 @@ void Json::clear()
                     }
                     delete m_value.m_array;
                     m_value.m_array = nullptr;
+                    // 不能像字符串一样直接释放指针，而是先释放其中元素的指针，再释放指向数组的指针
                 }
             }
             break;
@@ -378,7 +379,9 @@ void Json::remove(int index)
     {
         return;
     }
-    (m_value.m_array)->at(index).clear(); //成语函数at()返回下标为index的元素的引用，因为vector中存放的是Json类型的对象，所以要调用clear()成员函数
+    (m_value.m_array)->at(index).clear(); 
+    // 成员函数at()返回下标为index的元素的引用，因为vector中存放的是Json类型的对象(可能会有嵌套)
+    // 所以再调用库函数erase()之前要调用本类成员函数clear()先释放内存
     (m_value.m_array)->erase((m_value.m_array)->begin() + index);
 }
 
@@ -601,7 +604,7 @@ string Json::str() const
                     {   // 数组各元素之间用逗号隔开
                         ss << ",";
                     }
-                    ss << (*it).str();
+                    ss << (*it).str(); //成员函数的递归调用
                     // ss << it->str();
                 }
                 ss << "]";
@@ -616,7 +619,7 @@ string Json::str() const
                     {
                         ss << ",";
                     }
-                    ss << "\"" << it->first << "\":" << it->second.str(); //HINT：递归调用，虽然迭代器指向的是pair类型，因为pair中第二个类型是Json类型
+                    ss << "\"" << it->first << "\":" << it->second.str(); //HINT：递归调用，虽然迭代器指向的是pair类型，因为pair中value类型是Json类型
                 }
                 ss << "}";
             }
