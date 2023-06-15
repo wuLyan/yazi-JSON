@@ -40,7 +40,7 @@ Json Parser::parse()
     {
         // HINT：通过待解析字符串的第一个非空白字符判断字段类型，然后再分别调用不同字段类型的解析函数
         case 'n':
-            m_idx--; //将m_idx回退到待解析字符串中的第一个非空白字符，方便后续分字段类型解析的比较操作
+            m_idx--; //将m_idx回退到待解析字符串中的第一个非空白字符，方便后续分字段类型解析的比较操作，下同
             return parse_null();
         case 't':
         case 'f':
@@ -83,7 +83,7 @@ Json Parser::parse_null()
     if (m_str.compare(m_idx, 4, "null") == 0)
     {
         m_idx += 4;
-        return Json(); //调用默认构造函数
+        return Json(); //调用默认构造函数，字段类型为json_null
     }
     throw std::logic_error("parse null error");
 }
@@ -133,7 +133,7 @@ Json Parser::parse_number()
     {
         return Json(std::atoi(m_str.c_str() + pos));
         // HINT：c_str()函数将C++的string对象转化为C的字符串数组，即最后返回const char *类型的变量
-        // HINT：但是因为可能前面跳过了某些空白字符，需要加上解析开始的位置才是有效内容，然后直到'\0'才是真正需要进行转换的数字(含正负号)
+        // HINT：但是因为可能前面跳过了某些空白字符，需要加上开始解析的位置才是有效内容，然后直到'\0'才是真正需要进行转换的数字(含正负号)
     }
 
     // decimal part(小数部分)
@@ -168,6 +168,7 @@ string Parser::parse_string()
         }
 
         // The usual case: non-escaped characters
+        // 要在字符串正式内容中包含特殊字符，需要以反斜杠\开头
         if (ch == '\\')
         {
             ch = m_str[m_idx++];
@@ -180,9 +181,9 @@ string Parser::parse_string()
                 case 'r':
                 case '"':
                 case '\\':
-                    break; //跳出switch语句
+                    break; //跳出switch语句，继续外层的while循环
                 case 'u':
-                    m_idx += 4;
+                    m_idx += 4; //'\u'的特殊性，需要移动四个空格
                     break;
                 default:
                     break;
@@ -194,8 +195,8 @@ string Parser::parse_string()
 
 Json Parser::parse_array()
 {
-    // NOTE：为什么在函数parse_string()中使用 ch = m_str[m_idx++]; 获取下一个待解析字符，而在函数parse_array()中使用 char ch = get_next_token(); 获取下一个待解析字符？
-    // NOTE：因为一旦判定为待解析Json对象是一个字符串，那么其中不管有多少空白字符都必须算作是字符串的一部分，而对于vector容器，两个元素之间的空白字符必须跳过，
+    // NOTE：为什么在函数parse_string()中使用 ch = m_str[m_idx++] 获取下一个待解析字符，而在函数parse_array()中使用 char ch = get_next_token(); 获取下一个待解析字符？
+    // NOTE：因为一旦判定为待解析Json对象是一个字符串，那么其中不管有多少空白字符都必须算作是字符串的一部分，而对于vector容器，两个元素之间的所有空白字符都必须跳过，
     // NOTE：否则会使得空白字符算入下一个待解析字符的一部分，进而造成解析逻辑错误，在函数parse_object()中同理
     Json arr(Json::json_array);
     char ch = get_next_token();
@@ -206,13 +207,13 @@ Json Parser::parse_array()
     m_idx--; //回退到第一个待处理字符
     while (true)
     {
-        arr.append(parse()); //arr中存放的是Json对象，所以递归调用函数进行解析
-        ch = get_next_token();
-        if (ch == ']') //判断这次循环解析是否到达了vector的结尾，若条件成立，则结束解析(break跳出当前循环)
+        arr.append(parse()); //HINT：arr中存放的是Json对象，所以递归调用函数进行解析
+        ch = get_next_token(); //因为不同元素之间有可能有多个空白字符，所以在获取下一个字符前需要跳过空白字符
+        if (ch == ']') //判断这次逐元素解析是否到达了vector的结尾，若条件成立，则结束解析(break跳出当前循环)
         {
             break;
         }
-        if (ch != ',') //若这次循环解析没有到达结尾，则期望元素之间使用逗号进行分隔
+        if (ch != ',') //若这次逐元素解析没有到达结尾，则期望元素之间使用逗号进行分隔
         {
             throw new std::logic_error("expected ',' in array");
         }

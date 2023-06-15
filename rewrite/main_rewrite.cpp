@@ -65,6 +65,13 @@ int main()
     // v.parse(str);
     // cout << v.str() << endl;
 
+    // 注意对字符串的理解：两边的双引号只是字符串的格式，字符串的第一个字符可不是前双引号
+    // 如果想要让字符串的内容也是个字符串，需要使用转移字符，比如 str = "\"hello world\""
+    // const string & str = "[\"a\", 1, 1.23, true, false, null]"; 
+    // JsonRe v;
+    // v.parse(str);
+    // cout << v.str() << endl;
+
     ifstream fin("../test.json");
     stringstream ss;
     ss << fin.rdbuf();

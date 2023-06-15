@@ -138,13 +138,13 @@ std::string ParserRe::parse_string()
         {
             break;
         }
-        if (ch =='\\')
+        if (ch == '\\')
         {
             ch = m_str[m_idx ++];
             switch (ch)
             {
                 case '\n':
-                    out += '\n';
+                    out += '\n'; //这里在字符串连接时，把转义字符整体连接到后面
                     break;
                 case '\r':
                     out += '\r';
