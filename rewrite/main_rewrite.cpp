@@ -79,7 +79,8 @@ int main()
 
     JsonRe v;
     v.parse(str);
-    cout << v.str() << endl;
+    cout << v.str() << endl; 
+    // 由于字段类型为json_object的字段内容使用map容器进行存储，所以最后输出的顺序可能和原文件的顺序不一致，这属于正常状况
 
     // cout << "--------------" << endl;
 
