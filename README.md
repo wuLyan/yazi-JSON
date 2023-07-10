@@ -2,6 +2,8 @@
 
 a tiny c++ json parser
 
+你好，我是yazi本人，是yazi-json框架的作者，由于某些原因，这个框架已经不再开放了。请您将这个fork出来的框架设置成私有仓库吧，或者你重新换个名称，请不要用yazi-json这个名称，谢谢配合，感激不尽！
+
 ## example
 
 main.json
