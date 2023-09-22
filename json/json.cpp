@@ -199,7 +199,7 @@ void Json::copy(const Json &other)
                     m_value.m_array = new std::vector<Json>(); //重新开辟内存空间
                     for (auto it = (other.m_value.m_array)->begin(); it != (other.m_value.m_array)->end(); it++)
                     {
-                        m_value.m_array->push_back(*it); //调用拷贝构造函数
+                        m_value.m_array->push_back(*it); //调用拷贝构造函数，将原内存空间中的内存逐个拷贝至新内存空间
                     }
                 }
             }
@@ -315,6 +315,7 @@ void Json::clear()
     m_type = json_null;
 }
 
+// 检查是否存在给定索引
 bool Json::has(int index) const
 {
     if (m_type != json_array)
@@ -381,7 +382,7 @@ void Json::remove(int index)
     }
     (m_value.m_array)->at(index).clear(); 
     // 成员函数at()返回下标为index的元素的引用，因为vector中存放的是Json类型的对象(有嵌套)
-    // 所以再调用库函数erase()之前要调用本类成员函数clear()先释放内存
+    // 所以在调用库函数erase()之前要调用本类成员函数clear()先释放内存
     (m_value.m_array)->erase((m_value.m_array)->begin() + index);
 }
 
@@ -442,7 +443,7 @@ Json & Json::operator = (Json && other)
 }
 
 // HINT：只通过比较指针是否相同就可以判断两个对象是否相等了吗？万一是不同的指针指向了不同的内存空间，但空间中的内容是一样的呢？
-// HINT：
+// HINT：这里的做法确实比较粗糙
 bool Json::operator == (const Json & other)
 {
     if (m_type != other.type())
