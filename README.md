@@ -1,4 +1,4 @@
-# yazi-json
+# simple-json
 
 a tiny c++ json parser
 
