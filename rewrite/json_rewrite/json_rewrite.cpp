@@ -301,6 +301,7 @@ void JsonRe::clear()
                 delete m_value.m_string;
                 break;
             }
+        // 注意Json对象的嵌套，需要递归清空内存
         case json_array:
             {
                 for (auto it = (m_value.m_array)->begin(); it != (m_value.m_array)->end(); it++)
@@ -418,7 +419,7 @@ void JsonRe::remove(const std::string & key)
     {
         return;
     }
-    (*(m_value.m_object))[key].clear();
+    (*(m_value.m_object))[key].clear(); // 因为map容器的value是Json对象，所以需要先清空该对象的内存
     (m_value.m_object)->erase(key);
 }
 
